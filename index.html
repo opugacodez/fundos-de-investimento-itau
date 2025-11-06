@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tabela Dinâmica de Fundos de Investimento</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="bg-gray-100 font-sans p-4 sm:p-8">
+    <div
+      class="container mx-auto max-w-full bg-white shadow-2xl rounded-lg p-6 sm:p-8"
+    >
+      <header class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">
+          Painel de Fundos de Investimento
+        </h1>
+        <p class="text-gray-600">
+          Carregue um arquivo JSON para visualizar, filtrar e ordenar os dados.
+        </p>
+      </header>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div>
+          <label
+            for="fileInput"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Carregar Arquivo JSON</label
+          >
+          <input
+            type="file"
+            id="fileInput"
+            accept=".json"
+            class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+          />
+        </div>
+
+        <div>
+          <label
+            for="filterNome"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Filtrar por Nome</label
+          >
+          <input
+            type="text"
+            id="filterNome"
+            placeholder="Digite o nome do fundo..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        <div>
+          <label
+            for="filterCNPJ"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Filtrar por CNPJ</label
+          >
+          <input
+            type="text"
+            id="filterCNPJ"
+            placeholder="Digite o CNPJ..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        <div class="md:col-span-2 lg:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Filtrar por Risco</label
+          >
+          <div
+            id="filterRiscoContainer"
+            class="flex flex-wrap gap-x-4 gap-y-2 pt-2"
+          >
+            <span class="text-xs text-gray-500">Carregue um arquivo...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto w-full mb-4">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable"
+                data-column="nome"
+              >
+                Nome
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable"
+                data-column="possivel_cnpj"
+              >
+                CNPJ(s)
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable"
+                data-column="risco"
+              >
+                Risco
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable"
+                data-column="aplicacao_inicial"
+              >
+                Aplicação Inicial
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable"
+                data-column="12_meses"
+              >
+                12 Meses
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable"
+                data-column="no_ano"
+              >
+                No Ano
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable"
+                data-column="no_mes"
+              >
+                No Mês
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sortable"
+                data-column="taxa_maxima"
+              >
+                Taxa Máx.
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                data-column="resgate"
+              >
+                Resgate
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Lâmina
+              </th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+            <tr>
+              <td colspan="10" class="px-6 py-4 text-center text-gray-500">
+                Por favor, carregue um arquivo JSON para ver os dados.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="noResultsMessage" class="hidden text-center text-gray-500 py-4">
+        Nenhum fundo encontrado com os filtros aplicados.
+      </div>
+
+      <nav
+        id="paginationControls"
+        class="hidden flex items-center justify-between py-3"
+        aria-label="Pagination"
+      >
+        <div class="flex-1 flex justify-between sm:hidden">
+          <button
+            id="prevMobile"
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+          >
+            Anterior
+          </button>
+          <button
+            id="nextMobile"
+            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+          >
+            Próxima
+          </button>
+        </div>
+        <div
+          class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between"
+        >
+          <div>
+            <label for="itemsPerPage" class="text-sm text-gray-700 mr-2">
+              Itens por página:
+            </label>
+            <select
+              id="itemsPerPage"
+              class="w-20 px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
+            >
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+            <span id="paginationSummary" class="text-sm text-gray-700 ml-4">
+            </span>
+          </div>
+          <div>
+            <nav
+              id="pageNumbersContainer"
+              class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+              aria-label="Pagination"
+            >
+              <button
+                id="prevDesktop"
+                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              >
+                <span class="sr-only">Anterior</span>
+                <svg
+                  class="h-5 w-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+              <button
+                id="nextDesktop"
+                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              >
+                <span class="sr-only">Próxima</span>
+                <svg
+                  class="h-5 w-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+            </nav>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>

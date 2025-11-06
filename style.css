@@ -1,0 +1,23 @@
+th.sortable::after {
+  content: " \2195";
+  color: #9ca3af;
+  opacity: 0.5;
+}
+th.sortable.sort-asc::after {
+  content: " \2191";
+  opacity: 1;
+}
+th.sortable.sort-desc::after {
+  content: " \2193";
+  opacity: 1;
+}
+
+.cnpj-link {
+  cursor: pointer;
+  color: #2563eb;
+  text-decoration: underline;
+  font-weight: 500;
+}
+.cnpj-link:hover {
+  color: #1d4ed8;
+}

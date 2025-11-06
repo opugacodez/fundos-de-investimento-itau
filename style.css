@@ -1,14 +1,27 @@
+th.sortable {
+  position: relative;
+  padding-right: 20px !important;
+  white-space: nowrap;
+}
+
 th.sortable::after {
-  content: " \2195";
+  content: " ↕";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
   color: #9ca3af;
   opacity: 0.5;
+  font-size: 12px;
 }
+
 th.sortable.sort-asc::after {
-  content: " \2191";
+  content: " ↑";
   opacity: 1;
 }
+
 th.sortable.sort-desc::after {
-  content: " \2193";
+  content: " ↓";
   opacity: 1;
 }
 
@@ -17,7 +30,51 @@ th.sortable.sort-desc::after {
   color: #2563eb;
   text-decoration: underline;
   font-weight: 500;
+  word-break: break-word;
 }
+
 .cnpj-link:hover {
   color: #1d4ed8;
+}
+
+@media (max-width: 640px) {
+  .container {
+    margin: 0;
+    padding: 0.5rem;
+  }
+
+  table {
+    font-size: 0.75rem;
+  }
+
+  th,
+  td {
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .min-w-\[800px\] {
+    min-width: 800px;
+  }
+}
+
+#pageNumbersContainer .page-number,
+#pageNumbersContainer .page-ellipsis {
+  min-width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+
+input,
+select {
+  min-height: 2rem;
+}
+
+input[type="checkbox"] {
+  min-width: 1rem;
+  min-height: 1rem;
 }

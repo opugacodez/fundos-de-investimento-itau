@@ -319,32 +319,38 @@ document.addEventListener("DOMContentLoaded", () => {
         index % 2 === 0 ? "bg-white" : "bg-gray-50"
       }`;
 
-      const cnpjs = (item.possivel_cnpj || [])
+      const cnpjsHtml = (item.possivel_cnpj || [])
         .map((cnpj) => {
           const displayCnpj =
             appState.isMobile && cnpj.length > 14
               ? cnpj.substring(0, 12) + "..."
               : cnpj;
-          return `<span class="cnpj-link" data-cnpj="${cnpj}">${displayCnpj}</span>`;
+
+          return `
+          <div class="cnpj-item">
+            <span class="cnpj-link" data-cnpj="${cnpj}">${displayCnpj}</span>
+            <button class="copy-cnpj-btn copy-tooltip" data-cnpj="${cnpj}" title="Copiar CNPJ">
+              <svg class="copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              </svg>
+            </button>
+          </div>
+        `;
         })
-        .join("<br>");
+        .join("");
 
       tr.innerHTML = `
         <td class="px-3 py-3 whitespace-nowrap">
-          <div class="text-sm font-medium text-gray-900 truncate max-w-${
-            appState.isMobile ? "20" : "40"
+          <div class="text-sm font-medium text-gray-900 truncate
           }">
-            ${
-              appState.isMobile && item.nome.length > 20
-                ? item.nome.substring(0, 18) + "..."
-                : item.nome
-            }
+            ${item.nome}
           </div>
         </td>
         
         <td class="px-3 py-3 whitespace-nowrap">
-          <div class="text-sm text-gray-700">${cnpjs}</div>
-        </td>
+        <div class="cnpj-container">${cnpjsHtml}</div>
+      </td>
         
         <td class="px-3 py-3 whitespace-nowrap">
           <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full ${getRiscoClasses(
@@ -405,6 +411,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     ui.tableBody.querySelectorAll(".cnpj-link").forEach((link) => {
       link.addEventListener("click", handleCnpjClick);
+    });
+
+    ui.tableBody.querySelectorAll(".copy-cnpj-btn").forEach((button) => {
+      button.addEventListener("click", handleCopyCnpj);
     });
   }
 
@@ -506,6 +516,67 @@ document.addEventListener("DOMContentLoaded", () => {
           ui.pageNumbersContainer.appendChild(createPageButton(page, isActive));
         }
       });
+    }
+  }
+
+  async function handleCopyCnpj(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const button = event.currentTarget;
+    const cnpj = button.dataset.cnpj;
+
+    if (!cnpj) return;
+
+    try {
+      await navigator.clipboard.writeText(cnpj);
+
+      button.classList.add("copied");
+      button.innerHTML = `
+      <svg class="copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M5 13l4 4L19 7"/>
+      </svg>
+    `;
+
+      const originalTitle = button.title;
+      button.title = "CNPJ copiado!";
+
+      setTimeout(() => {
+        button.classList.remove("copied");
+        button.innerHTML = `
+        <svg class="copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+        </svg>
+      `;
+        button.title = originalTitle;
+      }, 2000);
+    } catch (err) {
+      console.error("Falha ao copiar CNPJ:", err);
+
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = cnpj;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+
+        button.classList.add("copied");
+        setTimeout(() => {
+          button.classList.remove("copied");
+        }, 2000);
+      } catch (fallbackErr) {
+        console.error("Fallback também falhou:", fallbackErr);
+        Swal.fire({
+          icon: "error",
+          title: "Erro ao copiar",
+          text: "Não foi possível copiar o CNPJ para a área de transferência.",
+          confirmButtonColor: "#3085d6",
+          confirmButtonText: "OK",
+        });
+      }
     }
   }
 

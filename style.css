@@ -25,6 +25,100 @@ th.sortable.sort-desc::after {
   opacity: 1;
 }
 
+.cnpj-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.cnpj-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+.copy-cnpj-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 3px;
+  color: #6b7280;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-cnpj-btn:hover {
+  opacity: 1;
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.copy-icon {
+  width: 12px;
+  height: 12px;
+  stroke: currentColor;
+}
+
+.copy-tooltip {
+  position: relative;
+}
+
+.copy-tooltip::before {
+  content: "Copiar CNPJ";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #374151;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 1000;
+}
+
+.copy-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: calc(100% - 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #374151;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 1000;
+}
+
+.copy-tooltip:hover::before,
+.copy-tooltip:hover::after {
+  opacity: 1;
+}
+
+.copy-cnpj-btn.copied {
+  color: #10b981;
+  opacity: 1;
+}
+
+.copy-cnpj-btn.copied:hover {
+  background-color: #ecfdf5;
+}
+
+.copy-cnpj-btn:active {
+  transform: scale(0.95);
+}
+
 .cnpj-link {
   cursor: pointer;
   color: #2563eb;
